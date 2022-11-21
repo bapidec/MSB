@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MSB - marsz, sprint, bieganie</string>
+    <string name="location_text">Current location: %1$.4f, %2$.4f</string>
+    <string name="location_permission_denied">LOCATION PERMISSION DENIED</string>
+    <string name="no_location">no location</string>
+</resources>
