@@ -36,8 +36,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, this);
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        locationTextView.setText(getString(R.string.location_text, location.getLatitude(), location.getLongitude()));
-        speedTextView.setText(getString(R.string.speed_text, location.getSpeed()));
+        if(location != null) {
+            locationTextView.setText(getString(R.string.location_text, location.getLatitude(), location.getLongitude()));
+            speedTextView.setText(getString(R.string.speed_text, location.getSpeed()));
+        } else {
+            locationTextView.setText(R.string.no_location);
+            speedTextView.setText(R.string.no_location);
+        }
     }
 
     @Override
