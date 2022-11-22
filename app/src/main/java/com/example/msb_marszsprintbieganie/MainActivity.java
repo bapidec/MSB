@@ -22,35 +22,41 @@ import com.google.android.gms.location.LocationServices;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private static final int REQUEST_LOCATION_PERMISSION = 1;
     private Location lastLocation;
-    private TextView locationTextView;
-    private FusedLocationProviderClient fusedLocationProviderClient;
+    private TextView locationTextView, speedTextView;
+    LocationManager locationManager;
 
-    private void getLocationPermission() {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    private void getLocation(LocationManager locationManager) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+            return;
         }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 1, this);
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        locationTextView.setText(getString(R.string.location_text, location.getLatitude(), location.getLongitude()));
+        speedTextView.setText(getString(R.string.speed_text, location.getSpeed()));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getLocationPermission();
         locationTextView = findViewById(R.id.location_textview);
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        speedTextView = findViewById(R.id.speed_textview);
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        getLocation(locationManager);
     }
 
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch(requestCode) {
+        switch (requestCode) {
             case REQUEST_LOCATION_PERMISSION:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation(locationManager);
                 } else {
                     Toast.makeText(this, R.string.location_permission_denied, Toast.LENGTH_SHORT).show();
                 }
@@ -60,4 +66,14 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        if(location != null) {
+            locationTextView.setText(getString(R.string.location_text, location.getLatitude(), location.getLongitude()));
+            speedTextView.setText(getString(R.string.speed_text, location.getSpeed()));
+        } else {
+            locationTextView.setText(R.string.no_location);
+            speedTextView.setText(R.string.no_location);
+        }
+    }
 }
